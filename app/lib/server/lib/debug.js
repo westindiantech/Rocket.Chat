@@ -20,8 +20,8 @@ const logger = new Logger('Meteor', {
 
 const logRequest = process.env.LOG_METHODS === 'false'
 	? () => {}
-	: (requestIp, userId = '-', method = '-', referer = '-', userAgent = '-') => {
-		console.log(`${ requestIp } - ${ userId } [${ new Date().toISOString() }] "METHOD ${ method }" - "${ referer }" "${ userAgent }"`);
+	: (requestIp, userId = '-', method = '-', referer = '-', userAgent = '-', body = '-') => {
+		console.log(`${ requestIp } - ${ userId } [${ new Date().toISOString() }] "METHOD ${ method }" - "${ referer }" "${ userAgent }" | ${ JSON.stringify(body) }`);
 	};
 
 let Log_Trace_Methods;
@@ -80,7 +80,7 @@ const wrapMethods = function(name, originalHandler, methodsMap) {
 		});
 		const args = name === 'ufsWrite' ? Array.prototype.slice.call(originalArgs, 1) : originalArgs;
 		logger.method(() => `${ name } -> userId: ${ Meteor.userId() }, arguments: ${ JSON.stringify(omitKeyArgs(args, name)) }`);
-		logRequest(this.connection?.clientAddress, this.userId, method, this.connection?.httpHeaders.referer, this.connection?.httpHeaders['user-agent']);
+		logRequest(this.connection?.clientAddress, this.userId, method, this.connection?.httpHeaders.referer, this.connection?.httpHeaders['user-agent'], args);
 		const result = originalHandler.apply(this, originalArgs);
 		end();
 		return result;

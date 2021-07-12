@@ -16,8 +16,8 @@ import { checkCodeForUser } from '../../2fa/server/code';
 
 const logRequest = process.env.LOG_REQUESTS === 'false'
 	? () => {}
-	: (requestIp, userId = '-', statusCode = '-', method = '-', url = '-', referer = '-', userAgent = '-') => {
-		console.log(`${ requestIp } - ${ userId } [${ new Date().toISOString() }] "${ method } ${ url }" ${ statusCode } - "${ referer }" "${ userAgent }"`);
+	: (requestIp, userId = '-', statusCode = '-', method = '-', url = '-', referer = '-', userAgent = '-', body = '-') => {
+		console.log(`${ requestIp } - ${ userId } [${ new Date().toISOString() }] "${ method } ${ url }" ${ statusCode } - "${ referer }" "${ userAgent }" | ${ JSON.stringify(body) }`);
 	};
 
 const logger = new Logger('API', {});
@@ -416,7 +416,7 @@ export class APIClass extends Restivus {
 						status: result.statusCode,
 					});
 
-					logRequest(this.requestIp, this.userId, result.statusCode, this.request.method, this.request.url, this.request.headers.referer, this.request.headers['user-agent']);
+					logRequest(this.requestIp, this.userId, result.statusCode, this.request.method, this.request.url, this.request.headers.referer, this.request.headers['user-agent'], this.request.body);
 
 					return result;
 				};
